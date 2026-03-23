@@ -13,7 +13,7 @@ wypas_core.hpp/cpp — C API for FFI (CGo, etc.)
 - Tile stacking: ground → down items (by topOrder) → top items (by alwaysOnTopOrder)
 - A* pathfinding: 512-node fixed pool, WalkCostFn callback (no creature dependency)
 - Multi-floor: 3D grid (x, y, z), staircase traversal via floorchange item flags
-- OTB loader: parses items.otb for item properties (blockSolid, alwaysOnTop, etc.)
+- Item types: populated externally via C API (wypas_set_item_type), no file loading
 
 ## C API
 See wypas_core.hpp — consumed by wypas-brain via CGo.

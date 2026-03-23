@@ -12,8 +12,8 @@ typedef struct WypasMap WypasMap;
 WypasMap* wypas_map_create(int width, int height, int floors);
 void      wypas_map_destroy(WypasMap* m);
 
-int wypas_load_items(const char* otb_path);
-void wypas_items_clear(void);
+void wypas_set_item_type(uint16_t server_id, uint32_t flags, uint16_t speed, uint8_t top_order);
+void wypas_clear_items(void);
 
 int wypas_tile_set_ground(WypasMap* m, int x, int y, int z, uint16_t item_id);
 int wypas_tile_add_item(WypasMap* m, int x, int y, int z, uint16_t item_id);

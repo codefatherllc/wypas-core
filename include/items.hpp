@@ -3,7 +3,6 @@
 
 #include "item_type.hpp"
 #include <cstdint>
-#include <string>
 #include <vector>
 
 namespace core {
@@ -12,7 +11,6 @@ class Items {
 public:
     static Items& getInstance();
 
-    bool loadFromOtb(const std::string& path);
     void clear();
 
     const ItemType& getItemType(uint16_t id) const;

@@ -24,12 +24,41 @@ void wypas_map_destroy(WypasMap* m) {
     delete m;
 }
 
-int wypas_load_items(const char* otb_path) {
-    if (!otb_path) return -1;
-    return core::Items::getInstance().loadFromOtb(otb_path) ? 0 : -1;
+void wypas_set_item_type(uint16_t server_id, uint32_t flags, uint16_t speed, uint8_t top_order) {
+    core::ItemType type;
+    type.id = server_id;
+    type.speed = speed;
+    type.alwaysOnTopOrder = top_order;
+
+    type.blockSolid = (flags & core::FLAG_BLOCK_SOLID) != 0;
+    type.blockProjectile = (flags & core::FLAG_BLOCK_PROJECTILE) != 0;
+    type.blockPathFind = (flags & core::FLAG_BLOCK_PATHFIND) != 0;
+    type.hasHeight = (flags & core::FLAG_HAS_HEIGHT) != 0;
+    type.pickupable = (flags & core::FLAG_PICKUPABLE) != 0;
+    type.movable = (flags & core::FLAG_MOVABLE) != 0;
+    type.stackable = (flags & core::FLAG_STACKABLE) != 0;
+    type.alwaysOnTop = (flags & core::FLAG_ALWAYSONTOP) != 0;
+    type.isVertical = (flags & core::FLAG_VERTICAL) != 0;
+    type.isHorizontal = (flags & core::FLAG_HORIZONTAL) != 0;
+    type.isHangable = (flags & core::FLAG_HANGABLE) != 0;
+    type.lookThrough = (flags & core::FLAG_LOOKTHROUGH) != 0;
+    type.isAnimation = (flags & core::FLAG_ANIMATION) != 0;
+    type.walkStack = (flags & core::FLAG_WALKSTACK) != 0;
+
+    type.floorChange[core::CHANGE_DOWN] = (flags & core::FLAG_FLOORCHANGEDOWN) != 0;
+    type.floorChange[core::CHANGE_NORTH] = (flags & core::FLAG_FLOORCHANGENORTH) != 0;
+    type.floorChange[core::CHANGE_EAST] = (flags & core::FLAG_FLOORCHANGEEAST) != 0;
+    type.floorChange[core::CHANGE_SOUTH] = (flags & core::FLAG_FLOORCHANGESOUTH) != 0;
+    type.floorChange[core::CHANGE_WEST] = (flags & core::FLAG_FLOORCHANGEWEST) != 0;
+
+    if (flags & core::FLAG_ALWAYSONTOP) {
+        type.group = core::ITEM_GROUP_NONE;
+    }
+
+    core::Items::getInstance().addItemType(server_id, type);
 }
 
-void wypas_items_clear(void) {
+void wypas_clear_items(void) {
     core::Items::getInstance().clear();
 }
 
