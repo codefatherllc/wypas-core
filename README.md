@@ -5,7 +5,7 @@ Shared C++17 library providing tile management, item loading, A* pathfinding, an
 ## Features
 
 - **Tile stacking** — ground, down items (by top order), and top items with automatic flag management
-- **OTB item loader** — parses `.otb` files for item properties (block solid, floor change, always on top, etc.)
+- **Item types via C API** — populated externally (block solid, floor change, always on top, etc.)
 - **A* pathfinding** — fixed 512-node pool, diagonal support, configurable walk cost callback
 - **Multi-floor maps** — 3D grid (x, y, z) with staircase traversal via floor change item flags
 - **Map validation** — reachability analysis across walkable tiles
@@ -41,8 +41,7 @@ All functions are declared in `wypas_core.hpp`.
 
 | Function | Description |
 |----------|-------------|
-| `wypas_load_items(otb_path)` | Load item properties from an OTB file. Returns 0 on success |
-| `wypas_register_item(id, group, block_solid, always_on_top, top_order)` | Register a single item type manually (without OTB file) |
+| `wypas_set_item_type(id, flags, speed, top_order)` | Register a single item type via C API |
 | `wypas_items_clear()` | Reset the item registry |
 
 ### Tile Operations
@@ -67,12 +66,11 @@ All functions are declared in `wypas_core.hpp`.
 // #cgo LDFLAGS: -lwypas-core -lstdc++
 // #include "wypas_core.hpp"
 import "C"
-import "unsafe"
 
 func main() {
-    otbPath := C.CString("items.otb")
-    defer C.free(unsafe.Pointer(otbPath))
-    C.wypas_load_items(otbPath)
+    // Push item types from Go-side DB query
+    C.wypas_set_item_type(100, 0x01, 200, 0) // id=100, flags=blockSolid, speed=200, topOrder=0
+    C.wypas_set_item_type(200, 0x00, 0, 1)   // id=200, no flags, topOrder=1
 
     m := C.wypas_map_create(100, 100, 1)
     defer C.wypas_map_destroy(m)
@@ -93,7 +91,7 @@ wypas-core/
     astar.hpp         A* pathfinding (nodes, findPath)
     defs.hpp          Enums, constants (ItemGroup, TileFlag, FloorChange)
     item_type.hpp     ItemType struct (properties, flags)
-    items.hpp         Item registry singleton (OTB loader)
+    items.hpp         Item registry singleton (C API populated)
     map.hpp           Map class (3D tile grid, pathfinding, validation)
     position.hpp      Position struct, Direction enum
     tile.hpp          Tile class (ground, stacking, walkability)
