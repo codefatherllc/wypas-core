@@ -106,6 +106,72 @@ int wypas_tile_get_item_count(WypasMap* m, int x, int y, int z) {
     return static_cast<int>(tile->getItemCount());
 }
 
+uint8_t wypas_tile_walk_flags(WypasMap* m, int x, int y, int z) {
+    if (!m) return 0;
+    const auto* tile = m->map.getTile(
+        static_cast<uint16_t>(x),
+        static_cast<uint16_t>(y),
+        static_cast<uint8_t>(z)
+    );
+    if (!tile) return 0;
+    return tile->walkFlags();
+}
+
+int wypas_tile_blocks_solid(WypasMap* m, int x, int y, int z) {
+    if (!m) return 0;
+    const auto* tile = m->map.getTile(
+        static_cast<uint16_t>(x),
+        static_cast<uint16_t>(y),
+        static_cast<uint8_t>(z)
+    );
+    if (!tile) return 0;
+    return tile->blocksSolid() ? 1 : 0;
+}
+
+int wypas_tile_blocks_projectile(WypasMap* m, int x, int y, int z) {
+    if (!m) return 0;
+    const auto* tile = m->map.getTile(
+        static_cast<uint16_t>(x),
+        static_cast<uint16_t>(y),
+        static_cast<uint8_t>(z)
+    );
+    if (!tile) return 0;
+    return tile->blocksProjectile() ? 1 : 0;
+}
+
+int wypas_tile_blocks_path(WypasMap* m, int x, int y, int z) {
+    if (!m) return 0;
+    const auto* tile = m->map.getTile(
+        static_cast<uint16_t>(x),
+        static_cast<uint16_t>(y),
+        static_cast<uint8_t>(z)
+    );
+    if (!tile) return 0;
+    return tile->blocksPathFind() ? 1 : 0;
+}
+
+int wypas_tile_has_floor_change(WypasMap* m, int x, int y, int z) {
+    if (!m) return 0;
+    const auto* tile = m->map.getTile(
+        static_cast<uint16_t>(x),
+        static_cast<uint16_t>(y),
+        static_cast<uint8_t>(z)
+    );
+    if (!tile) return 0;
+    return tile->hasFloorChange() ? 1 : 0;
+}
+
+uint32_t wypas_tile_get_flags(WypasMap* m, int x, int y, int z) {
+    if (!m) return 0;
+    const auto* tile = m->map.getTile(
+        static_cast<uint16_t>(x),
+        static_cast<uint16_t>(y),
+        static_cast<uint8_t>(z)
+    );
+    if (!tile) return 0;
+    return tile->getFlags();
+}
+
 int wypas_find_path(WypasMap* m,
                     int x1, int y1, int z1,
                     int x2, int y2, int z2,

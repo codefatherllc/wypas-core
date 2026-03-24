@@ -33,33 +33,104 @@ enum ItemGroup : uint8_t {
     ITEM_GROUP_LAST
 };
 
+enum ItemTypes_t {
+    ITEM_TYPE_NONE = 0,
+    ITEM_TYPE_DEPOT,
+    ITEM_TYPE_MAILBOX,
+    ITEM_TYPE_TRASHHOLDER,
+    ITEM_TYPE_CONTAINER,
+    ITEM_TYPE_DOOR,
+    ITEM_TYPE_MAGICFIELD,
+    ITEM_TYPE_TELEPORT,
+    ITEM_TYPE_BED,
+    ITEM_TYPE_KEY,
+    ITEM_TYPE_RUNE,
+    ITEM_TYPE_LAST
+};
+
+enum ITEMPROPERTY {
+    BLOCKSOLID = 0,
+    HASHEIGHT,
+    BLOCKPROJECTILE,
+    BLOCKPATH,
+    ISVERTICAL,
+    ISHORIZONTAL,
+    MOVABLE,
+    IMMOVABLEBLOCKSOLID,
+    IMMOVABLEBLOCKPATH,
+    IMMOVABLENOFIELDBLOCKPATH,
+    NOFIELDBLOCKPATH,
+    SUPPORTHANGABLE,
+    FLOORCHANGEDOWN,
+    FLOORCHANGEUP
+};
+
 enum TileFlag : uint32_t {
-    TILESTATE_NONE              = 0,
-    TILESTATE_PROTECTIONZONE    = 1 << 0,
-    TILESTATE_TRASHED           = 1 << 1,
-    TILESTATE_OPTIONALZONE      = 1 << 2,
-    TILESTATE_NOLOGOUT          = 1 << 3,
-    TILESTATE_HARDCOREZONE      = 1 << 4,
-    TILESTATE_REFRESH           = 1 << 5,
-    TILESTATE_HOUSE             = 1 << 6,
-    TILESTATE_FLOORCHANGE       = 1 << 7,
-    TILESTATE_FLOORCHANGE_DOWN  = 1 << 8,
-    TILESTATE_FLOORCHANGE_NORTH = 1 << 9,
-    TILESTATE_FLOORCHANGE_SOUTH = 1 << 10,
-    TILESTATE_FLOORCHANGE_EAST  = 1 << 11,
-    TILESTATE_FLOORCHANGE_WEST  = 1 << 12,
-    TILESTATE_BLOCKSOLID        = 1 << 23,
-    TILESTATE_BLOCKPATH         = 1 << 24
+    TILESTATE_NONE                      = 0,
+    TILESTATE_PROTECTIONZONE            = 1 << 0,
+    TILESTATE_TRASHED                   = 1 << 1,
+    TILESTATE_OPTIONALZONE              = 1 << 2,
+    TILESTATE_NOLOGOUT                  = 1 << 3,
+    TILESTATE_HARDCOREZONE              = 1 << 4,
+    TILESTATE_REFRESH                   = 1 << 5,
+    TILESTATE_HOUSE                     = 1 << 6,
+    TILESTATE_FLOORCHANGE               = 1 << 7,
+    TILESTATE_FLOORCHANGE_DOWN          = 1 << 8,
+    TILESTATE_FLOORCHANGE_NORTH         = 1 << 9,
+    TILESTATE_FLOORCHANGE_SOUTH         = 1 << 10,
+    TILESTATE_FLOORCHANGE_EAST          = 1 << 11,
+    TILESTATE_FLOORCHANGE_WEST          = 1 << 12,
+    TILESTATE_FLOORCHANGE_NORTH_EX      = 1 << 13,
+    TILESTATE_FLOORCHANGE_SOUTH_EX      = 1 << 14,
+    TILESTATE_FLOORCHANGE_EAST_EX       = 1 << 15,
+    TILESTATE_FLOORCHANGE_WEST_EX       = 1 << 16,
+    TILESTATE_TELEPORT                  = 1 << 17,
+    TILESTATE_MAGICFIELD                = 1 << 18,
+    TILESTATE_MAILBOX                   = 1 << 19,
+    TILESTATE_TRASHHOLDER               = 1 << 20,
+    TILESTATE_BED                       = 1 << 21,
+    TILESTATE_DEPOT                     = 1 << 22,
+    TILESTATE_BLOCKSOLID                = 1 << 23,
+    TILESTATE_BLOCKPATH                 = 1 << 24,
+    TILESTATE_IMMOVABLEBLOCKSOLID       = 1 << 25,
+    TILESTATE_IMMOVABLEBLOCKPATH        = 1 << 26,
+    TILESTATE_IMMOVABLENOFIELDBLOCKPATH = 1 << 27,
+    TILESTATE_NOFIELDBLOCKPATH          = 1 << 28,
+    TILESTATE_DYNAMIC_TILE              = 1 << 29,
+    TILESTATE_DIMENSION                 = 1 << 30
+};
+
+enum ZoneType_t {
+    ZONE_PROTECTION,
+    ZONE_OPTIONAL,
+    ZONE_HARDCORE,
+    ZONE_NOLOGOUT,
+    ZONE_OPEN
 };
 
 enum FloorChange : uint8_t {
-    CHANGE_DOWN = 0,
-    CHANGE_NORTH = 1,
+    CHANGE_PRE_FIRST = 0,
+    CHANGE_DOWN = CHANGE_PRE_FIRST,
+    CHANGE_FIRST = 1,
+    CHANGE_NORTH = CHANGE_FIRST,
     CHANGE_EAST = 2,
     CHANGE_SOUTH = 3,
     CHANGE_WEST = 4,
-    CHANGE_NONE = 9
+    CHANGE_FIRST_EX = 5,
+    CHANGE_NORTH_EX = CHANGE_FIRST_EX,
+    CHANGE_EAST_EX = 6,
+    CHANGE_SOUTH_EX = 7,
+    CHANGE_WEST_EX = 8,
+    CHANGE_NONE = 9,
+    CHANGE_PRE_LAST = 8,
+    CHANGE_LAST = CHANGE_NONE
 };
+
+inline constexpr uint8_t WALK_FLAG_SOLID     = 0x01;
+inline constexpr uint8_t WALK_FLAG_PATHBLOCK  = 0x02;
+inline constexpr uint8_t WALK_FLAG_CREATURE   = 0x04;
+inline constexpr uint8_t WALK_FLAG_PROJECTILE = 0x08;
+inline constexpr uint8_t WALK_FLAG_DIMENSION  = 0x10;
 
 enum OtbItemFlag : uint32_t {
     FLAG_BLOCK_SOLID       = 1 << 0,

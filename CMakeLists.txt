@@ -25,3 +25,4 @@ add_test(NAME test_astar COMMAND test_astar)
 add_executable(test_map tests/test_map.cpp)
 target_link_libraries(test_map wypas-core)
 add_test(NAME test_map COMMAND test_map)
+

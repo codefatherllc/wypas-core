@@ -64,6 +64,56 @@ static void registerTestItems() {
     wall.blockSolid = true;
     items.addItemType(400, wall);
 
+    // ID 401: projectile blocker
+    ItemType projBlock;
+    projBlock.id = 401;
+    projBlock.blockProjectile = true;
+    items.addItemType(401, projBlock);
+
+    // ID 402: path blocker
+    ItemType pathBlock;
+    pathBlock.id = 402;
+    pathBlock.blockPathFind = true;
+    items.addItemType(402, pathBlock);
+
+    // ID 403: immovable wall (blockSolid + !movable)
+    ItemType immovWall;
+    immovWall.id = 403;
+    immovWall.blockSolid = true;
+    immovWall.movable = false;
+    items.addItemType(403, immovWall);
+
+    // ID 410: floor change down
+    ItemType fcDown;
+    fcDown.id = 410;
+    fcDown.floorChange[CHANGE_DOWN] = true;
+    items.addItemType(410, fcDown);
+
+    // ID 411: floor change north
+    ItemType fcNorth;
+    fcNorth.id = 411;
+    fcNorth.floorChange[CHANGE_NORTH] = true;
+    items.addItemType(411, fcNorth);
+
+    // ID 412: floor change south-ex
+    ItemType fcSouthEx;
+    fcSouthEx.id = 412;
+    fcSouthEx.floorChange[CHANGE_SOUTH_EX] = true;
+    items.addItemType(412, fcSouthEx);
+
+    // ID 420: teleport
+    ItemType tp;
+    tp.id = 420;
+    tp.type = ITEM_TYPE_TELEPORT;
+    items.addItemType(420, tp);
+
+    // ID 421: magic field (blockPathFind)
+    ItemType mf;
+    mf.id = 421;
+    mf.type = ITEM_TYPE_MAGICFIELD;
+    mf.blockPathFind = true;
+    items.addItemType(421, mf);
+
     // ID 500: normal down item
     ItemType item;
     item.id = 500;
@@ -179,6 +229,134 @@ static void testRemoveItem() {
     std::cout << "  PASS: remove item" << std::endl;
 }
 
+static void testWalkFlagsComputation() {
+    Tile tile(100, 100, 7);
+    tile.addItem(100); // ground
+    assert(tile.walkFlags() == 0);
+    assert(!tile.blocksSolid());
+    assert(!tile.blocksProjectile());
+    assert(!tile.blocksPathFind());
+
+    tile.addItem(400); // wall (blockSolid)
+    assert(tile.blocksSolid());
+    assert((tile.walkFlags() & WALK_FLAG_SOLID) != 0);
+
+    tile.addItem(401); // projectile blocker
+    assert(tile.blocksProjectile());
+    assert((tile.walkFlags() & WALK_FLAG_PROJECTILE) != 0);
+
+    tile.addItem(402); // path blocker
+    assert(tile.blocksPathFind());
+    assert((tile.walkFlags() & WALK_FLAG_PATHBLOCK) != 0);
+
+    // All three flags set
+    uint8_t expected = WALK_FLAG_SOLID | WALK_FLAG_PROJECTILE | WALK_FLAG_PATHBLOCK;
+    assert(tile.walkFlags() == expected);
+
+    // Remove wall, solid flag should clear
+    tile.removeItem(400);
+    assert(!tile.blocksSolid());
+    assert(tile.blocksProjectile());
+    assert(tile.blocksPathFind());
+
+    std::cout << "  PASS: walk flag computation" << std::endl;
+}
+
+static void testFloorChangeDetection() {
+    Tile tile(100, 100, 7);
+    tile.addItem(100); // ground
+    assert(!tile.hasFloorChange());
+
+    tile.addItem(410); // floor change down
+    assert(tile.hasFloorChange());
+    assert(tile.hasFloorChange(CHANGE_DOWN));
+    assert(!tile.hasFloorChange(CHANGE_NORTH));
+    assert(tile.hasFlag(TILESTATE_FLOORCHANGE));
+    assert(tile.hasFlag(TILESTATE_FLOORCHANGE_DOWN));
+
+    Tile tile2(101, 100, 7);
+    tile2.addItem(100);
+    tile2.addItem(411); // floor change north
+    assert(tile2.hasFloorChange(CHANGE_NORTH));
+    assert(!tile2.hasFloorChange(CHANGE_DOWN));
+
+    Tile tile3(102, 100, 7);
+    tile3.addItem(100);
+    tile3.addItem(412); // floor change south-ex
+    assert(tile3.hasFloorChange(CHANGE_SOUTH_EX));
+    assert(tile3.hasFlag(TILESTATE_FLOORCHANGE_SOUTH_EX));
+
+    std::cout << "  PASS: floor change detection" << std::endl;
+}
+
+static void testBlockingFlagAccumulation() {
+    Tile tile(100, 100, 7);
+    tile.addItem(100); // ground
+
+    tile.addItem(400); // wall (blockSolid, movable=true by default)
+    assert(tile.hasFlag(TILESTATE_BLOCKSOLID));
+    assert(!tile.hasFlag(TILESTATE_IMMOVABLEBLOCKSOLID));
+
+    tile.removeItem(400);
+    assert(!tile.hasFlag(TILESTATE_BLOCKSOLID));
+
+    tile.addItem(403); // immovable wall (blockSolid + !movable)
+    assert(tile.hasFlag(TILESTATE_BLOCKSOLID));
+    assert(tile.hasFlag(TILESTATE_IMMOVABLEBLOCKSOLID));
+
+    tile.removeItem(403);
+    assert(!tile.hasFlag(TILESTATE_BLOCKSOLID));
+    assert(!tile.hasFlag(TILESTATE_IMMOVABLEBLOCKSOLID));
+
+    std::cout << "  PASS: blocking flag accumulation" << std::endl;
+}
+
+static void testItemTypeFlags() {
+    Tile tile(100, 100, 7);
+    tile.addItem(100); // ground
+
+    tile.addItem(420); // teleport
+    assert(tile.hasFlag(TILESTATE_TELEPORT));
+
+    tile.addItem(421); // magic field
+    assert(tile.hasFlag(TILESTATE_MAGICFIELD));
+    assert(tile.hasFlag(TILESTATE_BLOCKPATH));
+    assert(tile.hasFlag(TILESTATE_NOFIELDBLOCKPATH) == false);
+
+    tile.removeItem(421);
+    assert(!tile.hasFlag(TILESTATE_MAGICFIELD));
+    assert(!tile.hasFlag(TILESTATE_BLOCKPATH));
+
+    std::cout << "  PASS: item type flags (teleport, magicfield)" << std::endl;
+}
+
+static void testZoneType() {
+    Tile tile(100, 100, 7);
+    assert(tile.getZone() == ZONE_OPEN);
+
+    tile.setFlag(TILESTATE_PROTECTIONZONE);
+    assert(tile.getZone() == ZONE_PROTECTION);
+
+    tile.resetFlag(TILESTATE_PROTECTIONZONE);
+    tile.setFlag(TILESTATE_HARDCOREZONE);
+    assert(tile.getZone() == ZONE_HARDCORE);
+
+    std::cout << "  PASS: zone type" << std::endl;
+}
+
+static void testFloorChangeRemoval() {
+    Tile tile(100, 100, 7);
+    tile.addItem(100);
+    tile.addItem(410); // floor change down
+    assert(tile.hasFloorChange());
+
+    tile.removeItem(410);
+    assert(!tile.hasFloorChange());
+    assert(!tile.hasFlag(TILESTATE_FLOORCHANGE_DOWN));
+
+    std::cout << "  PASS: floor change removal" << std::endl;
+}
+
 int main() {
     registerTestItems();
 
@@ -190,6 +368,12 @@ int main() {
     testWalkability();
     testItemCount();
     testRemoveItem();
+    testWalkFlagsComputation();
+    testFloorChangeDetection();
+    testBlockingFlagAccumulation();
+    testItemTypeFlags();
+    testZoneType();
+    testFloorChangeRemoval();
 
     std::cout << "All tile tests passed." << std::endl;
     return 0;

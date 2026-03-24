@@ -13,6 +13,7 @@ struct ItemType {
     uint16_t speed = 0;
 
     ItemGroup group = ITEM_GROUP_NONE;
+    ItemTypes_t type = ITEM_TYPE_NONE;
     int32_t alwaysOnTopOrder = 0;
 
     bool blockSolid = false;
@@ -29,15 +30,24 @@ struct ItemType {
     bool walkStack = true;
     bool lookThrough = false;
     bool isAnimation = false;
+    bool usable = false;
+    bool rotable = false;
 
-    bool floorChange[CHANGE_NONE] = {};
+    bool floorChange[CHANGE_LAST] = {};
 
     bool isGroundTile() const { return group == ITEM_GROUP_GROUND; }
     bool isSplash() const { return group == ITEM_GROUP_SPLASH; }
     bool isAlwaysOnTop() const { return alwaysOnTop; }
+    bool isTeleport() const { return type == ITEM_TYPE_TELEPORT; }
+    bool isMagicField() const { return type == ITEM_TYPE_MAGICFIELD; }
+    bool isMailbox() const { return type == ITEM_TYPE_MAILBOX; }
+    bool isTrashHolder() const { return type == ITEM_TYPE_TRASHHOLDER; }
+    bool isBed() const { return type == ITEM_TYPE_BED; }
+    bool isDepot() const { return type == ITEM_TYPE_DEPOT; }
+    bool isDoor() const { return type == ITEM_TYPE_DOOR; }
 
     bool hasFloorChange() const {
-        for (int i = 0; i < CHANGE_NONE; ++i) {
+        for (int i = 0; i < CHANGE_LAST; ++i) {
             if (floorChange[i]) return true;
         }
         return false;

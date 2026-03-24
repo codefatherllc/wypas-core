@@ -19,6 +19,12 @@ int wypas_tile_set_ground(WypasMap* m, int x, int y, int z, uint16_t item_id);
 int wypas_tile_add_item(WypasMap* m, int x, int y, int z, uint16_t item_id);
 int wypas_tile_is_walkable(WypasMap* m, int x, int y, int z);
 int wypas_tile_get_item_count(WypasMap* m, int x, int y, int z);
+uint8_t wypas_tile_walk_flags(WypasMap* m, int x, int y, int z);
+int wypas_tile_blocks_solid(WypasMap* m, int x, int y, int z);
+int wypas_tile_blocks_projectile(WypasMap* m, int x, int y, int z);
+int wypas_tile_blocks_path(WypasMap* m, int x, int y, int z);
+int wypas_tile_has_floor_change(WypasMap* m, int x, int y, int z);
+uint32_t wypas_tile_get_flags(WypasMap* m, int x, int y, int z);
 
 int wypas_find_path(WypasMap* m,
                     int x1, int y1, int z1,
