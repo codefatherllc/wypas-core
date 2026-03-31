@@ -19,4 +19,15 @@ wypas_core.hpp/cpp — C API for FFI (CGo, etc.)
 See wypas_core.hpp — consumed by wypas-brain via CGo.
 
 ## CI
-.github/workflows/build.yml on main — builds + runs tests
+
+`.github/workflows/build.yml`:
+- Builds + tests on push to main and PRs
+- On tag push (`v*`): builds linux/amd64, linux/arm64, macos/arm64
+- Packages `libwypas-core.a` + headers as `wypas-core-{platform}-{arch}.tar.gz`
+- Creates GitHub Release with all platform archives
+
+## Releases
+
+v1.0.0 released. Consumed by:
+- **wypas-brain** (Go) -- CGo, downloaded via `make deps` from GitHub Releases
+- **wypas-server** (C++) -- cmake `add_subdirectory`

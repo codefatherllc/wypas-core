@@ -102,6 +102,23 @@ wypas-core/
   CMakeLists.txt    Build configuration
 ```
 
+## Releases
+
+Pre-built static libraries are published as GitHub Releases on tag push.
+
+Available platforms:
+- `wypas-core-linux-amd64.tar.gz`
+- `wypas-core-linux-arm64.tar.gz`
+- `wypas-core-macos-arm64.tar.gz`
+
+Each archive contains `lib/libwypas-core.a`, `include/*.hpp`, and `wypas_core.hpp`.
+
+## CI
+
+`.github/workflows/build.yml` runs on push to main, PRs, and tag push (`v*`).
+
+On tags: builds all three platforms, packages archives, creates GitHub Release.
+
 ## License
 
 GNU General Public License v2.0 — see [LICENSE](LICENSE).
