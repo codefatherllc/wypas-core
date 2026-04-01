@@ -27,14 +27,50 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install Ninja
+        run: |
+          if [ "${{ matrix.platform }}" = "linux" ]; then
+            sudo apt-get update && sudo apt-get install -y ninja-build
+          else
+            brew install ninja
+          fi
+
+      - name: Restore sccache
+        uses: actions/cache/restore@v4
+        with:
+          path: ~/.sccache
+          key: sccache-${{ matrix.platform }}-${{ matrix.arch }}-${{ github.ref_name }}-${{ github.sha }}
+          restore-keys: |
+            sccache-${{ matrix.platform }}-${{ matrix.arch }}-${{ github.ref_name }}-
+            sccache-${{ matrix.platform }}-${{ matrix.arch }}-
+
+      - name: Setup sccache
+        uses: mozilla-actions/sccache-action@v0.0.6
+
+      - name: Configure sccache
+        run: |
+          echo "SCCACHE_DIR=$HOME/.sccache" >> $GITHUB_ENV
+          echo "CMAKE_C_COMPILER_LAUNCHER=sccache" >> $GITHUB_ENV
+          echo "CMAKE_CXX_COMPILER_LAUNCHER=sccache" >> $GITHUB_ENV
+
       - name: Configure
-        run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+        run: |
+          cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_C_COMPILER_LAUNCHER=sccache \
+            -DCMAKE_CXX_COMPILER_LAUNCHER=sccache
 
       - name: Build
         run: cmake --build build --config Release
 
       - name: Test
         run: ctest --test-dir build --output-on-failure
+
+      - name: Save sccache
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: ~/.sccache
+          key: sccache-${{ matrix.platform }}-${{ matrix.arch }}-${{ github.ref_name }}-${{ github.sha }}
 
       - name: Package
         if: startsWith(github.ref, 'refs/tags/v')
